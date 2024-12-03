@@ -71,6 +71,8 @@ sudo apt-get install build-essential libssl-dev curl git-core openssh-server
 ```
 5.Download the Yiimp installation script and install it
 ```
+cd ~
+```
 git clone https://github.com/msy2008/yiimp_install_scrypt.git
 ```
 ```
