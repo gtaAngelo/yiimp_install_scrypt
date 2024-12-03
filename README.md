@@ -73,6 +73,7 @@ sudo apt-get install build-essential libssl-dev curl git-core openssh-server
 ```
 cd ~
 ```
+```
 git clone https://github.com/msy2008/yiimp_install_scrypt.git
 ```
 ```
