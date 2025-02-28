@@ -86,8 +86,8 @@ bash install.sh
 ##  Use separately developed stratum
 * Connect on your VPS =>
 
-Errors may occur when compiling stratum using ubuntu20.04
-Install libpsl-dev
+# Errors may occur when compiling stratum using ubuntu20.04
+# Install libpsl-dev
 ```
 sudo apt-get install libpsl-dev
 ```
