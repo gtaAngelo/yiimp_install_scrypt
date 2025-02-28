@@ -85,7 +85,13 @@ bash install.sh
 
 ##  Use separately developed stratum
 * Connect on your VPS =>
- 
+
+Errors may occur when compiling stratum using ubuntu20.04
+Install libpsl-dev
+```
+sudo apt-get install libpsl-dev
+```
+
 1.Download the Yiimp stratum
 ```
 git clone https://github.com/msy2008/stratum-full.git
