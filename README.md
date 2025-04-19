@@ -1,4 +1,4 @@
-# Yiimp_install_scrypt v1.0 (update msy2008, 2025)
+ff# Yiimp_install_scrypt v1.0 (update msy2008, 2025)
 
 Site : http://amxpool.com:8282
 
