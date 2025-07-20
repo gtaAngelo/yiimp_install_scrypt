@@ -4,8 +4,8 @@
 # Modified by : msy2008 (https://github.com/msy2008/yiimp_install_scrypt)
 
 # Program:
-#   Install yiimp on Ubuntu 16.04/18.04 running Nginx, MariaDB, and php7.2
-#   v1.0 (updated March 2024)
+#   Install yiimp on Ubuntu 22.04 running Nginx, MariaDB, and php8.2
+#   v1.0 (updated March 2025)
 #
 ################################################################################
 
@@ -45,7 +45,7 @@
     echo
     echo -e "$GREEN************************************************************************$COL_RESET"
     echo -e "$GREEN Yiimp Install Script v1.0 $COL_RESET"
-    echo -e "$GREEN Install yiimp on Ubuntu 16.04/18.04 running Nginx, MariaDB, and php7.2 $COL_RESET"
+    echo -e "$GREEN Install yiimp on Ubuntu 22.04 running Nginx, MariaDB, and php8.2 $COL_RESET"
     echo -e "$GREEN************************************************************************$COL_RESET"
     echo
     sleep 3
@@ -159,10 +159,10 @@
     echo -e "$GREEN Done...$COL_RESET"
 
 
-    # Installing Installing php7.2
+    # Installing Installing php8.2
     echo
     echo
-    echo -e "$CYAN => Installing php7.2 : $COL_RESET"
+    echo -e "$CYAN => Installing php8.2 : $COL_RESET"
     echo
     sleep 3
 
@@ -172,27 +172,63 @@
     fi
     sudo apt -y update
 
-    if [[ ("$DISTRO" == "16") ]]; then
-    sudo apt -y install php7.2-fpm php7.2-opcache php7.2 php7.2-common php7.2-gd php7.2-mysql php7.2-imap php7.2-cli \
-    php7.2-cgi php-pear php-auth imagemagick libruby php7.2-curl php7.2-intl php7.2-pspell mcrypt\
-    php7.2-recode php7.2-sqlite3 php7.2-tidy php7.2-xmlrpc php7.2-xsl memcached php-memcache php-imagick php-gettext php7.2-zip php7.2-mbstring
-    #sudo phpenmod mcrypt
-    #sudo phpenmod mbstring
-    else
-    sudo apt -y install php7.2-fpm php7.2-opcache php7.2 php7.2-common php7.2-gd php7.2-mysql php7.2-imap php7.2-cli \
-    php7.2-cgi php-pear imagemagick libruby php7.2-curl php7.2-intl php7.2-pspell mcrypt\
-    php7.2-recode php7.2-sqlite3 php7.2-tidy php7.2-xmlrpc php7.2-xsl memcached php7.2-memcache php7.2-memcached php-imagick php-gettext php7.2-zip php7.2-mbstring \
-    libpsl-dev libnghttp2-dev
+    # Ensure lsb_release is available (used to detect Ubuntu version)
+    if ! command -v lsb_release &>/dev/null; then
+        sudo apt-get update && sudo apt-get install -y lsb-release
     fi
-    sleep 5
-    sudo systemctl start php7.2-fpm
-    sudo systemctl status php7.2-fpm | sed -n "1,3p"
-    sleep 15
-    echo
-    echo -e "$GREEN Done...$COL_RESET"
 
+    # Correctly extract Ubuntu version
+    DISTRO=$(lsb_release -rs)
+    echo "Debug: Detected OS version: $DISTRO"
 
+    # Check if the OS is Ubuntu 22.04 (LTS)
+    if [[ "$DISTRO" != "22.04" ]]; then
+        echo -e "\033[31mAborting, wrong OS. Must be Ubuntu 22.04 (detected: $DISTRO).\033[0m"
+        exit 1
+    fi
 
+    # Define a function for apt package installation (with -y flag to avoid confirmation prompts)
+    apt_install() {
+        sudo apt-get install -y "$@"
+    }
+
+    # Update package lists from repositories
+    sudo apt-get update
+
+    # Add Ondrej PHP repository (critical fix for PHP 8.2 availability)
+    if ! apt-cache policy | grep -q "ondrej/php"; then
+        echo "Adding Ondrej PHP repository..."
+        sudo apt-get install -y software-properties-common  # Required for add-apt-repository
+        sudo add-apt-repository -y ppa:ondrej/php          # Official PHP packages may not have 8.2 yet
+        sudo apt-get update                                 # Update after adding the new repository
+    fi
+
+    # Install PHP 8.2 and its extensions
+    apt_install \
+        php8.2-fpm php8.2-opcache php8.2 php8.2-common php8.2-gd php8.2-mysql php8.2-imap php8.2-cli \
+        php8.2-cgi php-pear imagemagick libruby php8.2-curl php8.2-intl php8.2-pspell \
+        php8.2-sqlite3 php8.2-tidy php8.2-xmlrpc php8.2-xsl memcached php-memcache \
+        php-imagick php8.2-zip php8.2-mbstring libpsl-dev libnghttp2-dev \
+        php8.2-memcache php8.2-memcached net-tools
+
+    # Ensure phpenmod is available (provided by php8.2-common)
+    if ! command -v phpenmod &>/dev/null; then
+        apt_install php8.2-common
+    fi
+
+    # Enable required PHP modules (mbstring for multibyte string handling)
+    sudo phpenmod mbstring
+
+    # Set PHP 8.2 as the default PHP version
+    sudo update-alternatives --set php /usr/bin/php8.2
+
+    # Start PHP-FPM service and check its status (show only first 3 lines of status)
+    sudo systemctl start php8.2-fpm || { echo "Failed to start php8.2-fpm"; exit 1; }
+    sudo systemctl status php8.2-fpm --no-pager | sed -n "1,3p"
+
+    # Success message (green text)
+    echo -e "\033[32mDone... PHP 8.2 installed successfully!\033[0m"
+    
     # Installing other needed files
     echo
     echo
@@ -214,13 +250,13 @@
     echo
     sleep 3
 
-    sudo apt -y install software-properties-common build-essential
     sudo apt -y install libtool autotools-dev automake pkg-config libssl-dev libevent-dev bsdmainutils git cmake libboost-all-dev zlib1g-dev libz-dev libseccomp-dev libcap-dev libminiupnpc-dev gettext
-    sudo apt -y install libminiupnpc10 libzmq5
-    sudo apt -y install libcanberra-gtk-module libqrencode-dev libzmq3-dev
-    sudo apt -y install libqt5gui5 libqt5core5a libqt5webkit5-dev libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler
-    sudo add-apt-repository -y ppa:bitcoin/bitcoin
-    sudo apt -y update
+    sudo apt -y install libminiupnpc17 libzmq5
+    sudo apt -y install libcanberra-gtk-module libqrencode-dev libzmq3-dev libminizip-dev
+    sudo apt -y install libqt5gui5 libqt5core5a libqt5webkit5-dev libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler fonts-powerline
+    sudo apt -y install libssh-dev libbrotli-dev
+    sudo add-apt-repository -y ppa:luke-jr/bitcoincore
+    hide_output sudo apt -y update
     sudo apt -y install libdb4.8-dev libdb4.8++-dev libdb5.3 libdb5.3++
     echo -e "$GREEN Done...$COL_RESET"
 
@@ -333,7 +369,7 @@
     sudo ufw allow 8463/tcp
     sudo ufw allow 8433/tcp
     sudo ufw allow 8533/tcp
-	sudo ufw allow 9333/tcp
+    sudo ufw allow 9333/tcp
     sudo ufw allow 9321/tcp
     sudo ufw allow 22556/tcp
     sudo ufw allow 22171/tcp
@@ -377,25 +413,41 @@
     # Generating Random Password for stratum
     blckntifypass=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`
 
-    # Compil Blocknotify
+    # Compile Blocknotify
+    echo -e "Compiling Blocknotify"
     cd ~
-    git clone https://github.com/msy2008/yiimp.git
+    sudo git clone https://github.com/msy2008/yiimp.git
     cd $HOME/yiimp/blocknotify
     sudo sed -i 's/tu8tu5/'$blckntifypass'/' blocknotify.cpp
     make -j$((`nproc`+1))
+    sudo strip blocknotify
 
-    # Compil Stratum
+    # Compile Stratum
+    echo -e "Compiling Stratum"
     cd $HOME/yiimp/stratum/
-    git submodule init && git submodule update
-    make -C algos
-    make -C sha3
-    make -C iniparser
-    cd secp256k1 && chmod +x autogen.sh && ./autogen.sh && ./configure --enable-experimental --enable-module-ecdh --with-bignum=no --enable-endomorphism && make
+    sudo git submodule init && git submodule update
+    sudo apt_install gcc-10 g++-10 -y
+    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 10
+    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 11
+    sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 10
+    sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 11
+    sudo update-alternatives --set gcc /usr/bin/gcc-10
+    sudo update-alternatives --set g++ /usr/bin/g++-10 
+    
+    sudo git submodule init && git submodule update
+    sudo make -C algos
+    sudo make -C sha3
+    sudo make -C iniparser
+    cd secp256k1
+    sudo chmod +x autogen.sh && ./autogen.sh && ./configure --enable-experimental --enable-module-ecdh --with-bignum=no --enable-endomorphism && make
     cd $HOME/yiimp/stratum/
     if [[ ("$BTC" == "y" || "$BTC" == "Y") ]]; then
     sudo sed -i 's/CFLAGS += -DNO_EXCHANGE/#CFLAGS += -DNO_EXCHANGE/' $HOME/yiimp/stratum/Makefile
     fi
-    make -j$((`nproc`+1))
+    sudo make -j$((`nproc`+1))
+
+    sudo update-alternatives --set gcc /usr/bin/gcc-11 
+    sudo update-alternatives --set g++ /usr/bin/g++-11
 
     # Copy Files (Blocknotify,iniparser,Stratum)
     cd $HOME/yiimp
@@ -488,7 +540,7 @@
         error_log /var/log/nginx/'"${server_name}"'.app-error.log;
 
         # allow larger file uploads and longer script runtimes
-    client_body_buffer_size  50k;
+        client_body_buffer_size  50k;
         client_header_buffer_size 50k;
         client_max_body_size 50k;
         large_client_header_buffers 2 50k;
@@ -496,7 +548,7 @@
 
         location ~ ^/index\.php$ {
             fastcgi_split_path_info ^(.+\.php)(/.+)$;
-            fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
+            fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
             fastcgi_index index.php;
             include fastcgi_params;
             fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
@@ -533,7 +585,7 @@
             deny all;
       }
         location ~ /phpmyadmin/(.+\.php)$ {
-            fastcgi_pass unix:/run/php/php7.2-fpm.sock;
+            fastcgi_pass unix:/run/php/php8.2-fpm.sock;
             fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
             include fastcgi_params;
             include snippets/fastcgi-php.conf;
@@ -544,8 +596,8 @@
 
     sudo ln -s /etc/nginx/sites-available/$server_name.conf /etc/nginx/sites-enabled/$server_name.conf
     sudo ln -s /var/web /var/www/$server_name/html
-	sudo ln -s /var/stratum/config /var/web/list-algos
-    sudo systemctl reload php7.2-fpm.service
+    sudo ln -s /var/stratum/config /var/web/list-algos
+    sudo systemctl reload php8.2-fpm.service
     sudo systemctl restart nginx.service
     echo -e "$GREEN Done...$COL_RESET"
 
@@ -594,8 +646,8 @@
             access_log /var/log/nginx/'"${server_name}"'.app-access.log;
             error_log  /var/log/nginx/'"${server_name}"'.app-error.log;
 
-            # allow larger file uploads and longer script runtimes
-    client_body_buffer_size  50k;
+        # allow larger file uploads and longer script runtimes
+        client_body_buffer_size  50k;
         client_header_buffer_size 50k;
         client_max_body_size 50k;
         large_client_header_buffers 2 50k;
@@ -627,7 +679,7 @@
 
             location ~ ^/index\.php$ {
                 fastcgi_split_path_info ^(.+\.php)(/.+)$;
-                fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
+                fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
                 fastcgi_index index.php;
                 include fastcgi_params;
                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
@@ -658,7 +710,7 @@
             deny all;
     }
         location ~ /phpmyadmin/(.+\.php)$ {
-            fastcgi_pass unix:/run/php/php7.2-fpm.sock;
+            fastcgi_pass unix:/run/php/php8.2-fpm.sock;
             fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
             include fastcgi_params;
             include snippets/fastcgi-php.conf;
@@ -669,7 +721,7 @@
     ' | sudo -E tee /etc/nginx/sites-available/$server_name.conf >/dev/null 2>&1
     fi
 
-    sudo systemctl reload php7.2-fpm.service
+    sudo systemctl reload php8.2-fpm.service
     sudo systemctl restart nginx.service
     echo -e "$GREEN Done...$COL_RESET"
 
@@ -704,7 +756,7 @@
         error_log /var/log/nginx/'"${server_name}"'.app-error.log;
 
         # allow larger file uploads and longer script runtimes
-    client_body_buffer_size  50k;
+        client_body_buffer_size  50k;
         client_header_buffer_size 50k;
         client_max_body_size 50k;
         large_client_header_buffers 2 50k;
@@ -712,7 +764,7 @@
 
         location ~ ^/index\.php$ {
             fastcgi_split_path_info ^(.+\.php)(/.+)$;
-            fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
+            fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
             fastcgi_index index.php;
             include fastcgi_params;
             fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
@@ -749,7 +801,7 @@
             deny all;
     }
         location ~ /phpmyadmin/(.+\.php)$ {
-            fastcgi_pass unix:/run/php/php7.2-fpm.sock;
+            fastcgi_pass unix:/run/php/php8.2-fpm.sock;
             fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
             include fastcgi_params;
             include snippets/fastcgi-php.conf;
@@ -760,8 +812,8 @@
 
     sudo ln -s /etc/nginx/sites-available/$server_name.conf /etc/nginx/sites-enabled/$server_name.conf
     sudo ln -s /var/web /var/www/$server_name/html
-	sudo ln -s /var/stratum/config /var/web/list-algos
-    sudo systemctl reload php7.2-fpm.service
+    sudo ln -s /var/stratum/config /var/web/list-algos
+    sudo systemctl reload php8.2-fpm.service
     sudo systemctl restart nginx.service
     echo -e "$GREEN Done...$COL_RESET"
 
@@ -811,8 +863,8 @@
             access_log /var/log/nginx/'"${server_name}"'.app-access.log;
             error_log  /var/log/nginx/'"${server_name}"'.app-error.log;
 
-            # allow larger file uploads and longer script runtimes
-    client_body_buffer_size  50k;
+        # allow larger file uploads and longer script runtimes
+        client_body_buffer_size  50k;
         client_header_buffer_size 50k;
         client_max_body_size 50k;
         large_client_header_buffers 2 50k;
@@ -844,7 +896,7 @@
 
             location ~ ^/index\.php$ {
                 fastcgi_split_path_info ^(.+\.php)(/.+)$;
-                fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
+                fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
                 fastcgi_index index.php;
                 include fastcgi_params;
                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
@@ -877,7 +929,7 @@
             deny all;
     }
         location ~ /phpmyadmin/(.+\.php)$ {
-            fastcgi_pass unix:/run/php/php7.2-fpm.sock;
+            fastcgi_pass unix:/run/php/php8.2-fpm.sock;
             fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
             include fastcgi_params;
             include snippets/fastcgi-php.conf;
@@ -890,7 +942,7 @@
     echo -e "$GREEN Done...$COL_RESET"
 
     fi
-    sudo systemctl reload php7.2-fpm.service
+    sudo systemctl reload php8.2-fpm.service
     sudo systemctl restart nginx.service
     fi
 
@@ -1192,8 +1244,8 @@
     sudo systemctl status mysql | sed -n "1,3p"
     sudo systemctl restart nginx.service
     sudo systemctl status nginx | sed -n "1,3p"
-    sudo systemctl restart php7.2-fpm.service
-    sudo systemctl status php7.2-fpm | sed -n "1,3p"
+    sudo systemctl restart php8.2-fpm.service
+    sudo systemctl status php8.2-fpm | sed -n "1,3p"
 
 
     echo
@@ -1229,7 +1281,7 @@
     echo -e "$RED YOU MUST REBOOT NOW  TO FINALIZE INSTALLATION !!! $COL_RESET"
     echo -e "$RED***************************************************$COL_RESET"
     echo -e "$RED if u have white page blank on site check          $COL_RESET"
-    echo -e "$RED php7.2-memcache | php7.2-memcached | php7.2-fpm   $COL_RESET"
+    echo -e "$RED php8.2-memcache | php8.2-memcached | php8.2-fpm   $COL_RESET"
     echo -e "$RED try just restart them first...                    $COL_RESET"
     echo -e "$RED***************************************************$COL_RESET"
     echo
