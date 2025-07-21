@@ -542,7 +542,7 @@
         # allow larger file uploads and longer script runtimes
         client_body_buffer_size  50k;
         client_header_buffer_size 50k;
-        client_max_body_size 50k;
+        client_max_body_size 20m;
         large_client_header_buffers 2 50k;
         sendfile off;
 
@@ -557,7 +557,7 @@
             fastcgi_buffers 4 16k;
             fastcgi_connect_timeout 300;
             fastcgi_send_timeout 300;
-            fastcgi_read_timeout 300;
+            fastcgi_read_timeout 1300;
         try_files $uri $uri/ =404;
         }
         location ~ \.php$ {
@@ -649,14 +649,14 @@
         # allow larger file uploads and longer script runtimes
         client_body_buffer_size  50k;
         client_header_buffer_size 50k;
-        client_max_body_size 50k;
+        client_max_body_size 20m;
         large_client_header_buffers 2 50k;
         sendfile off;
 
             # strengthen ssl security
             ssl_certificate /etc/letsencrypt/live/'"${server_name}"'/fullchain.pem;
             ssl_certificate_key /etc/letsencrypt/live/'"${server_name}"'/privkey.pem;
-            ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+            ssl_protocols TLSv1.2 TLSv1.3;
             ssl_prefer_server_ciphers on;
             ssl_session_cache shared:SSL:10m;
             ssl_ciphers "EECDH+AESGCM:EDH+AESGCM:ECDHE-RSA-AES128-GCM-SHA256:AES256+EECDH:DHE-RSA-AES128-GCM-SHA256:AES256+EDH:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES256-GCM-SHA384:AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:AES256-SHA:AES128-SHA:DES-CBC3-SHA:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4";
@@ -688,7 +688,7 @@
                 fastcgi_buffers 4 16k;
                 fastcgi_connect_timeout 300;
                 fastcgi_send_timeout 300;
-                fastcgi_read_timeout 300;
+                fastcgi_read_timeout 1300;
                 include /etc/nginx/fastcgi_params;
             try_files $uri $uri/ =404;
         }
@@ -758,7 +758,7 @@
         # allow larger file uploads and longer script runtimes
         client_body_buffer_size  50k;
         client_header_buffer_size 50k;
-        client_max_body_size 50k;
+        client_max_body_size 20m;
         large_client_header_buffers 2 50k;
         sendfile off;
 
@@ -773,7 +773,7 @@
             fastcgi_buffers 4 16k;
             fastcgi_connect_timeout 300;
             fastcgi_send_timeout 300;
-            fastcgi_read_timeout 300;
+            fastcgi_read_timeout 1300;
         try_files $uri $uri/ =404;
         }
         location ~ \.php$ {
@@ -866,14 +866,14 @@
         # allow larger file uploads and longer script runtimes
         client_body_buffer_size  50k;
         client_header_buffer_size 50k;
-        client_max_body_size 50k;
+        client_max_body_size 20m;
         large_client_header_buffers 2 50k;
         sendfile off;
 
             # strengthen ssl security
             ssl_certificate /etc/letsencrypt/live/'"${server_name}"'/fullchain.pem;
             ssl_certificate_key /etc/letsencrypt/live/'"${server_name}"'/privkey.pem;
-            ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+            ssl_protocols TLSv1.2 TLSv1.3;
             ssl_prefer_server_ciphers on;
             ssl_session_cache shared:SSL:10m;
             ssl_ciphers "EECDH+AESGCM:EDH+AESGCM:ECDHE-RSA-AES128-GCM-SHA256:AES256+EECDH:DHE-RSA-AES128-GCM-SHA256:AES256+EDH:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES256-GCM-SHA384:AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:AES256-SHA:AES128-SHA:DES-CBC3-SHA:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4";
@@ -905,7 +905,7 @@
                 fastcgi_buffers 4 16k;
                 fastcgi_connect_timeout 300;
                 fastcgi_send_timeout 300;
-                fastcgi_read_timeout 300;
+                fastcgi_read_timeout 1300;
                 include /etc/nginx/fastcgi_params;
             try_files $uri $uri/ =404;
         }
