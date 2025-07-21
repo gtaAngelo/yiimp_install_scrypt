@@ -14,7 +14,6 @@ Discord: https://discord.gg/3Qq2neb
 
 Telegram: https://t.me/infinitecoin_IFC
 
-TUTO Youtube (16.04 / 18.04 - Without SSL) : https://www.youtube.com/watch?v=qE0rhfJ1g2k
 
 msy2008 Yiimp (used in this script for Yiimp Installation): https://github.com/msy2008/yiimp
 
