@@ -1030,7 +1030,7 @@
     cd yiimp/sql
 
     # Import sql dump
-    sudo zcat 2016-04-03-yaamp.sql.gz | sudo mysql --defaults-group-suffix=host1 --defaults-file=/home/${whoami}/.my.cnf
+    sudo zcat 2025-07-21-yaamp.sql.gz | sudo mysql --defaults-group-suffix=host1 --defaults-file=/home/${whoami}/.my.cnf
     echo -e "$GREEN Done...$COL_RESET"
     
     # Oh the humanity!
