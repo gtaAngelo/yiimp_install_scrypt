@@ -66,7 +66,7 @@ exit
 su pool
 ```
 ```
-sudo apt-get install build-essential libssl-dev curl git-core openssh-server
+sudo apt-get -y install build-essential libssl-dev curl git-core openssh-server
 ```
 5.Download the Yiimp installation script and install it
 ```
