@@ -42,7 +42,7 @@ USE THIS SCRIPT ON FRESH INSTALL UBUNTU Server 22.04 !
 apt update
 ```
 ```
-apt upgrade
+apt -y upgrade
 ```
 ```
 reboot
