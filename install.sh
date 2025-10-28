@@ -1057,7 +1057,12 @@
     sudo mysql --defaults-group-suffix=host1 yiimpfrontend --force < 2025-02-06-add_usemweb.sql
     sudo mysql --defaults-group-suffix=host1 yiimpfrontend --force < 2025-02-13-add_xelisv2-pepew.sql
     sudo mysql --defaults-group-suffix=host1 yiimpfrontend --force < 2025-02-23-add_algo_kawpow.sql
+    sudo mysql --defaults-group-suffix=host1 yiimpfrontend --force < 2025-03-31-rename_table_exchange.sql
     sudo mysql --defaults-group-suffix=host1 yiimpfrontend --force < 2025-10-05-add_argon2d1000.sql
+    sudo mysql --defaults-group-suffix=host1 yiimpfrontend --force < 2025-10-07-add_yespowerADVC.sql
+	sudo mysql --defaults-group-suffix=host1 yiimpfrontend --force < 2025-10-27-add_flex.sql
+    sudo mysql --defaults-group-suffix=host1 yiimpfrontend --force < 2025-10-27-add_rinhash.sql
+	sudo mysql --defaults-group-suffix=host1 yiimpfrontend --force < 2025-10-28-add_algo_phihash.sql
     echo -e "$GREEN Done...$COL_RESET"
 
     
